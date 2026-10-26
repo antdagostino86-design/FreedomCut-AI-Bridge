@@ -20,6 +20,7 @@ class MainActivity : Activity() {
  private val capcutPackage = "com.lemon.lvoverseas"
  private val officialUrl = "https://www.capcut.com/"
  private var portal: WebView? = null
+ private var desktopMode = true
  private lateinit var home: ScrollView
  private fun openCapCut() {
   val launch = packageManager.getLaunchIntentForPackage(capcutPackage)
@@ -31,6 +32,14 @@ class MainActivity : Activity() {
   val web = WebView(this)
   portal = web
   web.settings.javaScriptEnabled = true
+  web.settings.useWideViewPort = true
+  web.settings.loadWithOverviewMode = true
+  web.settings.builtInZoomControls = true
+  web.settings.displayZoomControls = false
+  web.settings.setSupportZoom(true)
+  val mobileAgent = web.settings.userAgentString
+  val desktopAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+  web.settings.userAgentString = if (desktopMode) desktopAgent else mobileAgent
   web.settings.domStorageEnabled = true
   web.settings.allowFileAccess = false
   web.settings.allowContentAccess = false
@@ -55,6 +64,15 @@ class MainActivity : Activity() {
   page.addView(Button(this).apply {
    text = "Torna a FreedomCut"
    setOnClickListener { closePortal() }
+  })
+  page.addView(Button(this).apply {
+   text = if (desktopMode) "Vista desktop attiva · passa a mobile" else "Vista mobile attiva · passa a desktop"
+   setOnClickListener {
+    desktopMode = !desktopMode
+    web.settings.userAgentString = if (desktopMode) desktopAgent else mobileAgent
+    text = if (desktopMode) "Vista desktop attiva · passa a mobile" else "Vista mobile attiva · passa a desktop"
+    web.reload()
+   }
   })
   page.addView(web, LinearLayout.LayoutParams(-1, 0, 1f))
   setContentView(page)
@@ -85,11 +103,11 @@ class MainActivity : Activity() {
    setPadding(32, 40, 32, 32)
   }
   layout.addView(TextView(this).apply {
-   text = "FreedomCut AI Bridge v0.3"
+   text = "FreedomCut AI Bridge v0.4"
    textSize = 24f
   })
   layout.addView(TextView(this).apply {
-   text = "Portale CapCut integrato\n\nRegistrati o accedi manualmente sul sito ufficiale senza uscire da FreedomCut. Le credenziali restano nella pagina CapCut. L'assegnazione di eventuali crediti promozionali non è garantita; alcuni accessi esterni potrebbero non funzionare in WebView."
+   text = "Portale CapCut integrato in modalità desktop\n\nRegistrati o accedi manualmente sul sito ufficiale senza uscire da FreedomCut. Le credenziali restano nella pagina CapCut. L'assegnazione di eventuali crediti promozionali non è garantita; alcuni accessi esterni potrebbero non funzionare in WebView."
    textSize = 16f
    setPadding(0, 20, 0, 16)
   })
